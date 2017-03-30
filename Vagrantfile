@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "ceph-admin" do |admin|
-    admin.vm.hostname = "au-ceph-admin.txel.systems"
+    admin.vm.hostname = "au-ceph-admin.lab.systems"
     admin.vm.network :private_network, ip: "192.168.10.10"
     admin.vm.provision :shell, :inline => "wget -q -O- 'https://download.ceph.com/keys/release.asc' | apt-key add -", :privileged => true
     admin.vm.provision :shell, :inline => "echo deb http://download.ceph.com/debian/ $(lsb_release -sc) main | tee /etc/apt/sources.list.d/ceph.list", :privileged => true
@@ -29,20 +29,15 @@ Vagrant.configure("2") do |config|
   end
 
   nodes = {
-    :rgw1  => {:host => 'au-ceph-rgw1',:domain => 'txel.systems', :ip => '192.168.10.20', :mem => 2048  },
-    :mon1  => {:host => 'au-ceph-mon1',:domain => 'txel.systems', :ip => '192.168.10.21', :mem => 2048  },
-    :cs2   => {:host => 'au-ceph-cs1', :domain => 'txel.systems', :ip => '192.168.10.22', :mem => 1024  },
-    :cs3   => {:host => 'au-ceph-cs2', :domain => 'txel.systems', :ip => '192.168.10.23', :mem => 1024  },
-    :cs4   => {:host => 'au-ceph-cs3', :domain => 'txel.systems', :ip => '192.168.10.24', :mem => 1024  },
+    :rgw1  => {:host => 'au-ceph-rgw1',:domain => 'lab.systems', :ip => '192.168.10.20', :mem => 2048  },
+    :mon1  => {:host => 'au-ceph-mon1',:domain => 'lab.systems', :ip => '192.168.10.21', :mem => 2048  },
+    :cs2   => {:host => 'au-ceph-cs1', :domain => 'lab.systems', :ip => '192.168.10.22', :mem => 1024  },
+    :cs3   => {:host => 'au-ceph-cs2', :domain => 'lab.systems', :ip => '192.168.10.23', :mem => 1024  },
+    :cs4   => {:host => 'au-ceph-cs3', :domain => 'lab.systems', :ip => '192.168.10.24', :mem => 1024  },
   }
 
   nodes.each do |name, options|
     config.vm.define name do |node|
-      # node.vm.provision options[:host] do |provisioner|
-      #   provisioner.autoconfigure = false
-      #   provisioner.add_host '192.168.10.10', ['au-ceph-admin.txel.system', 'au-ceph-admin', 'ceph-admin']
-      #   provisioner.add_host options[:ip], options[:host]
-      # end
       node.vm.provision :shell, :inline => "wget -q -O- 'https://download.ceph.com/keys/release.asc' | apt-key add -", :privileged => true
       node.vm.provision :shell, :inline => "echo deb http://download.ceph.com/debian/ $(lsb_release -sc) main | tee /etc/apt/sources.list.d/ceph.list", :privileged => true
       node.vm.provision :shell, :inline => "apt-get install -y apt-transport-https ntp && apt-get update && apt-get -y dist-upgrade"
